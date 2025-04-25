@@ -15,6 +15,7 @@
 import sys
 import os
 import json
+import requests
 
 import importlib
 sys.path.append(os.path.realpath('../modules'))
@@ -24,20 +25,18 @@ SampleUtilities = importlib.import_module('SampleUtilities')
 
 def main():
     # Create our client.
-    client = client_module.RestApiClient(version='6.0')
-
-    # Using the /asset_model/assets endpoint with a GET request.
-    SampleUtilities.pretty_print_request(client, 'asset_model/assets', 'GET')
-    response = client.call_api('asset_model/assets', 'GET')
+    headers = {"SEC": "load token into env"}
+    url = 'https://10.1.202.4/api/asset_model/assets'
+    response = requests.get(url=url, verify=False, headers=headers)
 
     # Verify that the call to the API was successful.
-    if (response.code != 200):
+    if (response.status_code != 200):
         print('Failed to retrieve asset list.')
         SampleUtilities.pretty_print_response(response)
         sys.exit(1)
 
     # Display the number of assets retrieved.
-    response_body = json.loads(response.read().decode('utf-8'))
+    response_body = response.json()
     number_of_assets_retrieved = len(response_body)
 
     # Display number of assets, and the IDs of the assets retrieved.
@@ -45,7 +44,13 @@ def main():
     if (number_of_assets_retrieved > 0):
         print("Asset IDs: ", end="")
         for asset in response_body:
-            print(str(asset['id']) + ' ', end="")
+            print(
+                str({asset["id"]}) +
+                " : hostname: " +
+                str({asset['hostnames'][0]['name']}) +
+                " : IP: " +
+                str({asset['interfaces'][0]['ip_addresses'][0]['value']})
+            )
         print()
 
 if __name__ == "__main__":
