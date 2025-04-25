@@ -47,7 +47,7 @@ class RestApiClient:
         # Create a secure SSLContext
         # PROTOCOL_SSLv23 is misleading.  PROTOCOL_SSLv23 will use the highest
         # version of SSL or TLS that both the client and server supports.
-        context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+        context = ssl.SSLContext(ssl.PROTOCOL_SSLv23, ssl.CERT_NONE)
 
         # SSL version 2 and SSL version 3 are insecure. The insecure versions
         # are disabled.
@@ -72,7 +72,7 @@ class RestApiClient:
                     else:
                         print(response + " is not a valid response.")
 
-        context.verify_mode = ssl.CERT_REQUIRED
+        context.verify_mode = ssl.CERT_NONE
         if sys.version_info >= (3, 4):
             context.check_hostname = True
 
